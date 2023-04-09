@@ -1,6 +1,7 @@
 import Search from './search';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { SearchInterface } from './types';
 
 const setup = (overrides?: Partial<SearchInterface>) => {
   const props: SearchInterface = {
