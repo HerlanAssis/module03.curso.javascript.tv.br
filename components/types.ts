@@ -11,3 +11,7 @@ export interface ProductCardInterface {
   product: ProductType;
   addToCart(product: ProductType): void;
 }
+
+export interface CartItemInterface {
+  product: ProductType;
+}
