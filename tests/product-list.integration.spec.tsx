@@ -1,9 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import ProductList from '../pages/index';
-import axios from 'axios';
-import { act } from 'react-dom/test-utils';
-
-jest.mock('axios');
+import { Response, Server } from 'miragejs';
+import { AnyRegistry } from 'miragejs/-types';
+import { makeServer } from '@/miragejs/server';
+import ProductList from '@/pages/index';
 
 const setup = () => {
   const renderResult = render(<ProductList />);
@@ -11,13 +10,17 @@ const setup = () => {
 };
 
 describe('ProductList', () => {
-  const mockedAxios = jest.mocked(axios);
+  let server: Server<AnyRegistry>;
+
+  beforeEach(() => {
+    server = makeServer({ environment: 'test' });
+  });
+
+  afterEach(() => {
+    server.shutdown();
+  });
 
   it('should render the component', async () => {
-    act(() => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { products: [] } });
-    });
-
     setup();
 
     await waitFor(() => {
@@ -26,10 +29,6 @@ describe('ProductList', () => {
   });
 
   it('should render the loading spinner', () => {
-    act(() => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { products: [] } });
-    });
-
     setup();
 
     expect(screen.getByRole('status')).toBeInTheDocument();
@@ -37,8 +36,8 @@ describe('ProductList', () => {
 
   it('should render error message when axios call reject', async () => {
     const message = 'Unit test - Erro ao carregar lista';
-    act(() => {
-      mockedAxios.get.mockRejectedValueOnce(new Error(message));
+    server.get('products', () => {
+      return new Response(500, {}, { message });
     });
 
     setup();
@@ -49,18 +48,23 @@ describe('ProductList', () => {
   });
 
   it('should render the ProductCart component 10 times', async () => {
-    act(() => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { products: [] } });
-    });
+    const quantity = 10;
+    server.createList('product', quantity);
 
     setup();
 
     await waitFor(() => {
-      expect(screen.getAllByTestId('product-cart-tid')).toHaveLength(10);
+      expect(screen.getAllByTestId('product-cart-tid')).toHaveLength(quantity);
     });
   });
 
-  it.todo('should render empty state for product list');
+  it('should render empty state for product list', async () => {
+    setup();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('empty-product-list-tid')).toBeInTheDocument();
+    });
+  });
 
   it.todo('should render the Search component');
 

@@ -1,8 +1,8 @@
-import '../styles/globals.css';
+import '@/styles/globals.css';
 
-import Cart from '../components/cart';
+import Cart from '@/components/cart';
 
-import { makeServer } from '../miragejs/server';
+import { makeServer } from '@/miragejs/server';
 
 if (process.env.NODE_ENV === 'development') {
   makeServer({ environment: 'development' });

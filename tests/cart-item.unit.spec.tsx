@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import CartItem from '../components/cart-item';
-import { CartItemInterface } from '../components/types';
+import CartItem from '@/components/cart-item';
+import { CartItemInterface } from '@/components/types';
 
 jest.mock('next/image', () => ({
   __esModule: true,

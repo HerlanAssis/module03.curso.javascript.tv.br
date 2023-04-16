@@ -1,51 +1,24 @@
-import { ProductInterface } from '@/components/types';
-import axios from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { useFetchProducts } from '@/hooks';
 import Router from 'next/router';
-import ProductCard from '../components/product-card';
-import Search from '../components/search';
-
-const InitialState = [
-  {
-    id: '1',
-    title: 'Relógio bonito',
-    price: '22.00',
-    image:
-      'https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
-  },
-];
+import { useCallback } from 'react';
+import ProductCard from '@/components/product-card';
+import Search from '@/components/search';
 
 export default function Home() {
-  const [products, setProducts] = useState<ProductInterface[]>(InitialState);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const { products, error, loading } = useFetchProducts();
 
   const renderProducts = useCallback(() => {
+    if (!products.length) {
+      return (
+        <div className="m-16" data-testid="empty-product-list-tid">
+          <p className="font-bold">Nenhum produto na lista.</p>
+        </div>
+      );
+    }
     return products.map((product) => (
       <ProductCard key={product.id} product={product} addToCart={() => {}} />
     ));
   }, [products]);
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        setLoading(true);
-        const {
-          data: { products },
-        } = await axios.get<{ products: ProductInterface[] }>('/api/products');
-
-        setProducts(products);
-
-        setError(null);
-      } catch (error) {
-        setError(error as Error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getData();
-  }, []);
 
   if (loading) {
     return (

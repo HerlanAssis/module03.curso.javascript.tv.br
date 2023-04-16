@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import ProductCard from '../components/product-card';
-import { ProductCardInterface } from '../components/types';
+import ProductCard from '@/components/product-card';
+import { ProductCardInterface } from '@/components/types';
 
 const setup = (overrides?: Partial<ProductCardInterface>) => {
   const product = {
