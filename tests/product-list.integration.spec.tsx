@@ -124,4 +124,28 @@ describe('ProductList', () => {
       expect(screen.getByText(new RegExp('10 products', 'i'))).toBeInTheDocument();
     });
   });
+
+  it('should display proper quantity when list is filtered', async () => {
+    const quantity = 10;
+    const searchTerm = 'Relógio';
+    server.createList('product', quantity);
+    server.create('product', {
+      title: 'Relógio bonito',
+    } as any);
+    server.create('product', {
+      title: 'Relógio top',
+    } as any);
+
+    const { user } = setup();
+
+    const input = await screen.findByPlaceholderText('Search');
+    const form = await screen.findByRole('form');
+
+    await user.type(input, searchTerm);
+    fireEvent.submit(form);
+
+    await waitFor(() => {
+      expect(screen.getByText(new RegExp('2 products', 'i'))).toBeInTheDocument();
+    });
+  });
 });
