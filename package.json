@@ -13,7 +13,11 @@
     "test:unit:watch": "jest --config=jest-unit.config.ts --watchAll",
     "test:integration": "jest --config=jest-integration.config.ts",
     "test:integration:watch": "jest --config=jest-integration.config.ts --watchAll",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "start-server-and-test dev 3000 cypress:open",
+    "test:e2e:headless": "start-server-and-test dev 3000 cypress:run"
   },
   "dependencies": {
     "@types/node": "18.15.11",
@@ -38,9 +42,11 @@
     "@testing-library/user-event": "^14.4.3",
     "@types/jest": "^29.5.0",
     "babel-jest": "^29.5.0",
+    "cypress": "^12.9.0",
     "jest": "^29.5.0",
     "jest-environment-jsdom": "^29.5.0",
     "miragejs": "^0.1.47",
+    "start-server-and-test": "^2.0.0",
     "ts-node": "^10.9.1"
   }
 }
