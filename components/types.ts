@@ -15,3 +15,7 @@ export interface ProductCardInterface {
 export interface CartItemInterface {
   product: ProductType;
 }
+
+export interface ProductInterface extends ProductType {
+  id: string;
+}

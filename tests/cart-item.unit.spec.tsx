@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import CartItem from './cart-item';
-import { CartItemInterface } from './types';
+import CartItem from '../components/cart-item';
+import { CartItemInterface } from '../components/types';
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -41,18 +41,31 @@ describe('CartItem', () => {
     expect(screen.getByTestId('pimage-tid')).toHaveProperty('alt', product.title);
   });
 
+  it('should display 1 as initial quantity', () => {
+    setup();
+
+    const quantity = screen.getByTestId('quantity-tid');
+
+    expect(quantity.textContent).toEqual('1');
+  });
+
   it('should decrease quantity when decrease button gets clicked', () => {
     setup();
 
+    const increaseButton = screen.getByTestId('increase-button-tid');
     const decreaseButton = screen.getByTestId('decrease-button-tid');
-    let quantity = screen.getByTestId('quantity-tid');
 
+    let quantity = screen.getByTestId('quantity-tid');
     expect(quantity.textContent).toEqual('1');
 
-    fireEvent.click(decreaseButton);
-
+    fireEvent.click(increaseButton);
     quantity = screen.getByTestId('quantity-tid');
-    expect(quantity.textContent).toEqual('0');
+    expect(quantity.textContent).toEqual('2');
+
+    fireEvent.click(decreaseButton);
+    quantity = screen.getByTestId('quantity-tid');
+
+    expect(quantity.textContent).toEqual('1');
   });
 
   it('should increase quantity when increase button gets clicked', () => {
