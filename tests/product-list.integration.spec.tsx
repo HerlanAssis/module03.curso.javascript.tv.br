@@ -48,7 +48,7 @@ describe('ProductList', () => {
     });
   });
 
-  it.('should render the ProductCart component 10 times', async () => {
+  it('should render the ProductCart component 10 times', async () => {
     act(() => {
       mockedAxios.get.mockResolvedValueOnce({ data: { products: [] } });
     });
