@@ -35,6 +35,7 @@ describe('useFetchProducts', () => {
 
     await waitFor(() => {
       expect(result.current.products).toHaveLength(quantity);
+      expect(result.current.error).toBe(null);
     });
   });
 
@@ -50,7 +51,7 @@ describe('useFetchProducts', () => {
     });
   });
 
-  it('should return error message when server return code 500', async () => {
+  it('should render server error message when server return code 500', async () => {
     const message = 'Erro ao carregar a lista';
     server.get('products', () => {
       return new Response(500, {}, { message });
@@ -60,6 +61,7 @@ describe('useFetchProducts', () => {
 
     await waitFor(() => {
       expect(result.current.error?.message).toBe(message);
+      expect(result.current.products).toHaveLength(0);
     });
   });
 });

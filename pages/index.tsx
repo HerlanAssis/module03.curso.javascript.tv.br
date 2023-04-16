@@ -1,24 +1,43 @@
 import { useFetchProducts } from '@/hooks';
 import Router from 'next/router';
-import { useCallback } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import ProductCard from '@/components/product-card';
 import Search from '@/components/search';
 
 export default function Home() {
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const { products, error, loading } = useFetchProducts();
 
+  const productFilteredList = useMemo(() => {
+    if (searchTerm.length) {
+      return products.filter((product) =>
+        product.title.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()),
+      );
+    }
+
+    return products;
+  }, [searchTerm, products]);
+
+  const renderProductQuantity = () => {
+    if (productFilteredList.length > 1) {
+      return `${productFilteredList.length} Products`;
+    }
+
+    return `${productFilteredList.length} Product`;
+  };
+
   const renderProducts = useCallback(() => {
-    if (!products.length) {
+    if (!productFilteredList.length) {
       return (
         <div className="m-16" data-testid="empty-product-list-tid">
           <p className="font-bold">Nenhum produto na lista.</p>
         </div>
       );
     }
-    return products.map((product) => (
+    return productFilteredList.map((product) => (
       <ProductCard key={product.id} product={product} addToCart={() => {}} />
     ));
-  }, [products]);
+  }, [productFilteredList]);
 
   if (loading) {
     return (
@@ -41,6 +60,7 @@ export default function Home() {
         <button
           className="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           onClick={() => Router.reload()}
+          data-testid="reload-page-tid"
         >
           Regarregar página?
         </button>
@@ -50,10 +70,10 @@ export default function Home() {
 
   return (
     <main className="my-8" data-testid="product-list-tid">
-      <Search />
+      <Search doSearch={(term) => setSearchTerm(term)} />
       <div className="container mx-auto px-6">
         <h3 className="text-gray-700 text-2xl font-medium">Wrist Watch</h3>
-        <span className="mt-3 text-sm text-gray-500">200+ Products</span>
+        <span className="mt-3 text-sm text-gray-500">{renderProductQuantity()}</span>
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
           {renderProducts()}
         </div>

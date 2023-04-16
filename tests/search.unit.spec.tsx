@@ -62,4 +62,17 @@ describe('Search', () => {
     expect((searchInput as HTMLInputElement).value).toBe(searchTerm);
     expect(doSearch).toHaveBeenCalledWith(searchTerm);
   });
+
+  it('should call props.doSearch() when search input is cleared', async () => {
+    const searchTerm = 'Relógio bonito';
+    const doSearch = jest.fn();
+    const { user, searchInput } = setup({ doSearch });
+
+    await user.type(searchInput, searchTerm);
+    await user.clear(searchInput);
+
+    expect(doSearch).toHaveBeenCalledTimes(1);
+    expect(doSearch).toHaveBeenCalledWith('');
+    expect((searchInput as HTMLInputElement).value).toBe('');
+  });
 });

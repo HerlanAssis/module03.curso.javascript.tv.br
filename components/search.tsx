@@ -1,11 +1,15 @@
 import { useState } from 'react';
+import { SearchInterface } from './types';
 
 export default function Search({ doSearch }: SearchInterface) {
   const [term, setTerm] = useState<string>('');
 
-  const onSubmit = () => {
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     doSearch(term);
   };
+
+  const onClear = () => doSearch('');
 
   return (
     <form
@@ -32,6 +36,7 @@ export default function Search({ doSearch }: SearchInterface) {
         placeholder="Search"
         onChange={({ target: { value } }) => {
           setTerm(value);
+          if (!value.length) onClear();
         }}
         value={term}
       />

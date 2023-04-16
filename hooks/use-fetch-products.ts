@@ -20,8 +20,6 @@ const useFetchProducts = () => {
       } catch (error) {
         if (axios.isAxiosError(error)) {
           setError(new Error(error.response?.data.message));
-        } else {
-          setError(error as Error);
         }
       } finally {
         setLoading(false);
