@@ -33,25 +33,18 @@ describe('Cart store', () => {
     expect(isCartOpen).toBe(false);
   });
 
-  it('should toggle open state', async () => {
+  it('should toggle open state', () => {
     const { result } = setup();
 
-    const isCartOpen = result.current.state.open;
-    const toggleCart = result.current.actions.toggle;
+    expect(result.current.state.open).toBe(false);
+    expect(result.current.state.products).toHaveLength(0);
 
-    expect(isCartOpen).toBe(false);
+    act(() => result.current.actions.toggle());
+    expect(result.current.state.open).toBe(true);
 
-    act(() => toggleCart());
-
-    await waitFor(() => {
-      expect(result.current.state.open).toBe(true);
-    });
-
-    act(() => toggleCart());
-
-    await waitFor(() => {
-      expect(isCartOpen).toBe(false);
-    });
+    act(() => result.current.actions.toggle());
+    expect(result.current.state.open).toBe(false);
+    expect(result.current.state.products).toHaveLength(0);
   });
 
   it('should return an empty array for products on initial state', () => {
@@ -62,7 +55,7 @@ describe('Cart store', () => {
     expect(products).toHaveLength(0);
   });
 
-  it.each([2])('should add %s products to the list', async (quantity: number) => {
+  it.each([2, 3, 5, 8, 13, 21])('should add %s products to the list', async (quantity: number) => {
     const mockProducts = server.createList('product', quantity) as unknown as ProductInterface[];
     const { result } = setup();
     const add = result.current.actions.add;
@@ -71,10 +64,11 @@ describe('Cart store', () => {
 
     await waitFor(() => {
       expect(result.current.state.products).toHaveLength(quantity);
+      expect(result.current.state.open).toBe(true);
     });
   });
 
-  it('shouldnt add duplicated product to the list', () => {
+  it('shouldnt add the same product twice', () => {
     const mockProduct = server.create('product') as unknown as ProductInterface;
     const { result } = setup();
 
@@ -86,5 +80,6 @@ describe('Cart store', () => {
     act(() => add(mockProduct));
 
     expect(result.current.state.products).toHaveLength(1);
+    expect(result.current.state.open).toBe(true);
   });
 });

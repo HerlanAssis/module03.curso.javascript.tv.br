@@ -19,6 +19,7 @@ const CartStore: CartStoreType = (set, get) => ({
       set((store) => ({
         state: {
           ...store.state,
+          open: true,
           products: Array.from(
             new Map<string, ProductInterface>(
               [...store.state.products, ...product].map((product) => [product.id, product]),

@@ -3,7 +3,12 @@ import { useCartStore } from '@/store';
 import CartItem from './cart-item';
 
 export default function Cart() {
-  const [cartOpen, toggleCart] = useCartStore((store) => [store.state.open, store.actions.toggle]);
+  const { open: cartOpen, products } = useCartStore((store) => store.state);
+  const toggleCart = useCartStore((store) => store.actions.toggle);
+
+  const renderCartItems = () => {
+    return products.map((product) => <CartItem key={product.id} product={product} />);
+  };
 
   return (
     <div
@@ -29,14 +34,7 @@ export default function Cart() {
         </button>
       </div>
       <hr className="my-3" />
-      <CartItem
-        product={{
-          title: 'Relógio bonito',
-          price: '22.00',
-          image:
-            'https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
-        }}
-      />
+      {renderCartItems()}
       <div className="mt-8">
         <form className="flex items-center justify-center">
           <input className="form-input w-48" type="text" placeholder="Add promocode" />

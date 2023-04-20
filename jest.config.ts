@@ -10,6 +10,7 @@ module.exports = {
     '<rootDir>/components/**/*.(js|ts|tsx|jsx)',
     '<rootDir>/pages/**/*.(js|ts|tsx|jsx)',
     '<rootDir>/hooks/**/*.(js|ts|tsx|jsx)',
+    '<rootDir>/store/*/**/*.(js|ts|tsx|jsx)',
   ],
   moduleNameMapper: {
     // see: https://github.com/kulshekhar/ts-jest/issues/414#issuecomment-517944368

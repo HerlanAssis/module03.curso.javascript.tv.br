@@ -3,10 +3,12 @@ import Router from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
 import ProductCard from '@/components/product-card';
 import Search from '@/components/search';
+import { useCartStore } from '@/store';
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const { products, error, loading } = useFetchProducts();
+  const addToCart = useCartStore((state) => state.actions.add);
 
   const productFilteredList = useMemo(() => {
     if (searchTerm.length) {
@@ -35,9 +37,9 @@ export default function Home() {
       );
     }
     return productFilteredList.map((product) => (
-      <ProductCard key={product.id} product={product} addToCart={() => {}} />
+      <ProductCard key={product.id} product={product} addToCart={() => addToCart(product)} />
     ));
-  }, [productFilteredList]);
+  }, [productFilteredList, addToCart]);
 
   if (loading) {
     return (
