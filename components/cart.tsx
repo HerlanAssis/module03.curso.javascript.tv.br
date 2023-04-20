@@ -1,11 +1,20 @@
+import clsx from 'clsx';
+import { useCartStore } from '@/store';
 import CartItem from './cart-item';
 
 export default function Cart() {
+  const [cartOpen, toggleCart] = useCartStore((store) => [store.state.open, store.actions.toggle]);
+
   return (
-    <div className="fixed right-0 top-0 max-w-xs w-full h-full px-6 py-4 transition duration-300 transform overflow-y-auto bg-white border-l-2 border-gray-300 z-50">
+    <div
+      className={clsx(
+        'fixed right-0 top-0 max-w-xs w-full h-full px-6 py-4 transition duration-300 transform overflow-y-auto bg-white border-l-2 border-gray-300 z-50',
+        !cartOpen && 'hidden',
+      )}
+    >
       <div className="flex items-center justify-between">
         <h3 className="text-2xl font-medium text-gray-700">Your cart</h3>
-        <button className="text-gray-600 focus:outline-none">
+        <button className="text-gray-600 focus:outline-none" onClick={toggleCart}>
           <svg
             className="h-5 w-5"
             fill="none"
