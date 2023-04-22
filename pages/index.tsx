@@ -37,7 +37,7 @@ export default function Home() {
       );
     }
     return productFilteredList.map((product) => (
-      <ProductCard key={product.id} product={product} addToCart={() => addToCart(product)} />
+      <ProductCard key={product.id} product={product} addToCart={addToCart} />
     ));
   }, [productFilteredList, addToCart]);
 

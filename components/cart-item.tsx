@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { CartItemInterface } from './types';
 import Image from 'next/image';
+import { useCartStore } from '@/store';
 
 export default function CartItem({ product }: CartItemInterface) {
+  const { remove } = useCartStore((store) => store.actions);
   const [quantity, setQuantity] = useState(1);
 
   const isDecreaseButtonDisabled = quantity === 0;
@@ -14,6 +16,8 @@ export default function CartItem({ product }: CartItemInterface) {
   const increaseQuantity = () => {
     setQuantity((currentQuantity) => ++currentQuantity);
   };
+
+  const removeProduct = () => remove(product.id);
 
   return (
     <div data-testid="cart-item-tid" className="flex justify-between mt-6">
@@ -28,6 +32,9 @@ export default function CartItem({ product }: CartItemInterface) {
         />
         <div className="mx-3">
           <h3 className="text-sm text-gray-600">{product.title}</h3>
+          <button data-testid="remove-button-tid" onClick={removeProduct}>
+            Remove item
+          </button>
           <div className="flex items-center mt-2">
             <button
               onClick={decreaseQuantity}

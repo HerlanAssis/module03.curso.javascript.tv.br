@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import CartItem from '@/components/cart-item';
 import { CartItemInterface } from '@/components/types';
+import { useCartStore } from '@/store';
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -10,8 +11,13 @@ jest.mock('next/image', () => ({
   },
 }));
 
+jest.mock('@/store', () => ({
+  useCartStore: jest.fn(() => ({ remove: () => {} })),
+}));
+
 const setup = (overrides?: Partial<CartItemInterface>) => {
   const product = {
+    id: '1',
     title: 'Relógio bonito',
     price: '22.00',
     image:
@@ -94,5 +100,19 @@ describe('CartItem', () => {
 
     expect(quantity.textContent).toEqual('0');
     expect(screen.getByTestId('decrease-button-tid')).toHaveProperty('disabled', true);
+  });
+
+  it("should remove item when 'Remove item' button gets clicked", () => {
+    const remove = jest.fn();
+    jest.mocked(useCartStore).mockImplementationOnce(() => ({ remove }));
+
+    const { product } = setup();
+
+    const button = screen.getByTestId('remove-button-tid');
+
+    fireEvent.click(button);
+
+    expect(remove).toBeCalledTimes(1);
+    expect(remove).toBeCalledWith(product.id);
   });
 });

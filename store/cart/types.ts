@@ -1,7 +1,7 @@
 import { ProductInterface } from '@/components/types';
 import { StateCreator } from 'zustand';
 
-interface CartStoreStateInterface {
+export interface CartStoreStateInterface {
   open: boolean;
   products: ProductInterface[];
 }
@@ -9,6 +9,8 @@ interface CartStoreStateInterface {
 interface CartStoreStateActions {
   toggle: () => void;
   add: (...product: ProductInterface[]) => void;
+  remove: (...productId: string[]) => void;
+  clear: () => void;
 }
 
 export interface CartStateInterface {
