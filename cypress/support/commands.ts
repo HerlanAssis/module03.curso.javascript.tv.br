@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 // https://stackoverflow.com/questions/57132428/augmentations-for-the-global-scope-can-only-be-directly-nested-in-external-modul
-export {}
+export {};
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -32,8 +32,8 @@ export {}
 declare global {
   namespace Cypress {
     interface Chainable {
-      getByTestId(selector: string): Chainable<JQuery<Node>>
-      addToCart({ indexes }: { indexes: 'all' | number[] }): void
+      getByTestId(selector: string): Chainable<JQuery<Node>>;
+      addToCart({ indexes }: { indexes: 'all' | number[] }): void;
       //   login(email: string, password: string): Chainable<void>
       //   drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
       //   dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
@@ -43,28 +43,27 @@ declare global {
 }
 
 Cypress.Commands.add('getByTestId', (selector: string) => {
-  return cy.get(`[data-testid="${selector}"]`)
-})
+  return cy.get(`[data-testid="${selector}"]`);
+});
 
 Cypress.Commands.add('addToCart', ({ indexes }) => {
-  cy.getByTestId('product-cart-tid').as('productList')
+  cy.getByTestId('product-cart-tid').as('productList');
 
   const addProductOnCart = (index: number, isLast: boolean) => {
-    cy.get('@productList').eq(index).find('button').click()
+    cy.get('@productList').eq(index).find('button').click();
 
-    if (!isLast) cy.getByTestId('toggle-cart').click()
-  }
+    if (!isLast) cy.getByTestId('close-cart-tid').click();
+  };
 
   if (indexes === 'all') {
     cy.get('@productList').then(($elements: JQuery<HTMLElement>) => {
-      for (let i = 0; i < $elements.length; i++)
-        addProductOnCart(i, i === $elements.length - 1)
-    })
+      for (let i = 0; i < $elements.length; i++) addProductOnCart(i, i === $elements.length - 1);
+    });
   }
 
   if (Array.isArray(indexes)) {
     indexes.forEach((pindex, i) => {
-      addProductOnCart(pindex, i === indexes.length - 1)
-    })
+      addProductOnCart(pindex, i === indexes.length - 1);
+    });
   }
-})
+});

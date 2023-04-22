@@ -39,6 +39,12 @@ describe('Cart', () => {
     expect(screen.getByTestId('cart-tid')).toBeInTheDocument();
   });
 
+  it('should not display "Clear" button when are no items in the cart" ', () => {
+    setup();
+
+    expect(screen.queryByTestId('clear-cart-button-tid')).not.toBeInTheDocument();
+  });
+
   it('should add css class "hidden" in the component', () => {
     setup();
 
@@ -56,7 +62,7 @@ describe('Cart', () => {
   it('should call store.toggle() twice', () => {
     const { resultCartStore } = setup();
 
-    const button = screen.getByTestId('toggle-cart-tid');
+    const button = screen.getByTestId('close-cart-tid');
     const spyToggle = jest.spyOn(resultCartStore.current.actions, 'toggle');
 
     act(() => resultCartStore.current.actions.toggle());
