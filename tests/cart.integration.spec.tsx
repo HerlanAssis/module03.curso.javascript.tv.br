@@ -139,4 +139,21 @@ describe('Cart', () => {
 
     expect(productList).toHaveLength(0);
   });
+
+  it('should clear and close cart when checkout button gets clicked', () => {
+    const [product1, product2] = server.createList('product', 2) as unknown as ProductInterface[];
+
+    const { resultCartStore } = setup();
+
+    act(() => resultCartStore.current.actions.add(product1, product2));
+
+    const checkoutButton = screen.getByTestId('checkout-cart-button-tid');
+    const productList = screen.getAllByTestId('cart-item-tid');
+    expect(productList).toHaveLength(2);
+
+    fireEvent.click(checkoutButton);
+
+    expect(screen.getByText(/There are no items in the cart./i)).toBeInTheDocument();
+    expect(screen.getByTestId('cart-tid')).toHaveClass('hidden');
+  });
 });
