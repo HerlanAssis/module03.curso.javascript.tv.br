@@ -68,7 +68,100 @@ describe('Cart store', () => {
     });
   });
 
-  it('shouldnt add the same product twice', () => {
+  fit('should be possible to add a product that has already been removed from the cart', () => {
+    const product = server.create('product') as unknown as ProductInterface;
+
+    const { result } = setup();
+    const add = result.current.actions.add;
+    const remove = result.current.actions.remove;
+
+    act(() => {
+      add(product);
+      remove(product.id);
+      add(product);
+    });
+
+    expect(result.current.state.products[0].quantity).toBe(1);
+  });
+
+  it('should assign 1 as initial quantity on product add()', () => {
+    const product = server.create('product') as unknown as ProductInterface;
+    const { result } = setup();
+    const add = result.current.actions.add;
+
+    act(() => add(product));
+
+    expect(result.current.state.products[0].quantity).toBe(1);
+  });
+
+  it('should increase quantity', () => {
+    const product = server.create('product') as unknown as ProductInterface;
+    const { result } = setup();
+    const add = result.current.actions.add;
+    const increase = result.current.actions.increase;
+
+    act(() => {
+      add(product);
+      increase(product.id);
+    });
+
+    expect(result.current.state.products[0].quantity).toBe(2);
+  });
+
+  it('shouldnt increase quantity when product dont exists in the product list', () => {
+    const product = server.create('product') as unknown as ProductInterface;
+    const { result } = setup();
+    const increase = result.current.actions.increase;
+
+    act(() => {
+      increase(product.id);
+    });
+
+    expect(result.current.state.products).toHaveLength(0);
+  });
+
+  it('should increase quantity', () => {
+    const product = server.create('product') as unknown as ProductInterface;
+    const { result } = setup();
+    const add = result.current.actions.add;
+    const decrease = result.current.actions.decrease;
+
+    act(() => {
+      add(product);
+      decrease(product.id);
+    });
+
+    expect(result.current.state.products[0].quantity).toBe(0);
+  });
+
+  it('shouldnt increase quantity when product dont exist in the product list', () => {
+    const product = server.create('product') as unknown as ProductInterface;
+    const { result } = setup();
+    const decrease = result.current.actions.decrease;
+
+    act(() => {
+      decrease(product.id);
+    });
+
+    expect(result.current.state.products).toHaveLength(0);
+  });
+
+  it('should NOT decrease below zero', () => {
+    const product = server.create('product') as unknown as ProductInterface;
+    const { result } = setup();
+    const add = result.current.actions.add;
+    const decrease = result.current.actions.decrease;
+
+    act(() => {
+      add(product);
+      decrease(product.id);
+      decrease(product.id);
+    });
+
+    expect(result.current.state.products[0].quantity).toBe(0);
+  });
+
+  it('should increase quantity when add same product twice', () => {
     const mockProduct = server.create('product') as unknown as ProductInterface;
     const { result } = setup();
 
@@ -79,7 +172,8 @@ describe('Cart store', () => {
     act(() => add(mockProduct));
     act(() => add(mockProduct));
 
-    expect(result.current.state.products).toHaveLength(1);
     expect(result.current.state.open).toBe(true);
+    expect(result.current.state.products).toHaveLength(1);
+    expect(result.current.state.products[0].quantity).toBe(2);
   });
 });

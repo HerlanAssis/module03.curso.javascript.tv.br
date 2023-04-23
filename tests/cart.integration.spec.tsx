@@ -6,7 +6,9 @@ import { act, fireEvent, render, renderHook, screen } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 import { Server } from 'miragejs';
 import { AnyRegistry } from 'miragejs/-types';
+import { setAutoFreeze } from 'immer';
 
+setAutoFreeze(false);
 const storeResetFns = new Set<() => unknown>();
 
 const setup = () => {

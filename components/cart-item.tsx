@@ -4,18 +4,13 @@ import Image from 'next/image';
 import { useCartStore } from '@/store';
 
 export default function CartItem({ product }: CartItemInterface) {
-  const { remove } = useCartStore((store) => store.actions);
-  const [quantity, setQuantity] = useState(1);
+  const { remove, increase, decrease } = useCartStore((store) => store.actions);
 
-  const isDecreaseButtonDisabled = quantity === 0;
+  const isDecreaseButtonDisabled = (product?.quantity ?? 0) === 0;
 
-  const decreaseQuantity = () => {
-    if (quantity > 0) setQuantity((currentQuantity) => --currentQuantity);
-  };
+  const decreaseQuantity = () => decrease(product.id);
 
-  const increaseQuantity = () => {
-    setQuantity((currentQuantity) => ++currentQuantity);
-  };
+  const increaseQuantity = () => increase(product.id);
 
   const removeProduct = () => remove(product.id);
 
@@ -55,7 +50,7 @@ export default function CartItem({ product }: CartItemInterface) {
               </svg>
             </button>
             <span data-testid="quantity-tid" className="text-gray-700 mx-2">
-              {quantity}
+              {product?.quantity ?? 0}
             </span>
             <button
               data-testid="increase-button-tid"

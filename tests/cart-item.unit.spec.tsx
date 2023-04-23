@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import CartItem from '@/components/cart-item';
 import { CartItemInterface } from '@/components/types';
 import { useCartStore } from '@/store';
@@ -20,6 +20,7 @@ const setup = (overrides?: Partial<CartItemInterface>) => {
     id: '1',
     title: 'Relógio bonito',
     price: '22.00',
+    quantity: 1,
     image:
       'https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
   };
@@ -47,59 +48,32 @@ describe('CartItem', () => {
     expect(screen.getByTestId('pimage-tid')).toHaveProperty('alt', product.title);
   });
 
-  it('should display 1 as initial quantity', () => {
-    setup();
+  it('should call store.decrease() when decrease button gets clicked', async () => {
+    const decrease = jest.fn();
+    jest.mocked(useCartStore).mockImplementationOnce(() => ({ decrease }));
 
-    const quantity = screen.getByTestId('quantity-tid');
-
-    expect(quantity.textContent).toEqual('1');
-  });
-
-  it('should decrease quantity when decrease button gets clicked', () => {
-    setup();
-
-    const increaseButton = screen.getByTestId('increase-button-tid');
-    const decreaseButton = screen.getByTestId('decrease-button-tid');
-
-    let quantity = screen.getByTestId('quantity-tid');
-    expect(quantity.textContent).toEqual('1');
-
-    fireEvent.click(increaseButton);
-    quantity = screen.getByTestId('quantity-tid');
-    expect(quantity.textContent).toEqual('2');
-
-    fireEvent.click(decreaseButton);
-    quantity = screen.getByTestId('quantity-tid');
-
-    expect(quantity.textContent).toEqual('1');
-  });
-
-  it('should increase quantity when increase button gets clicked', () => {
-    setup();
-
-    const increaseButton = screen.getByTestId('increase-button-tid');
-    let quantity = screen.getByTestId('quantity-tid');
-
-    expect(quantity.textContent).toEqual('1');
-
-    fireEvent.click(increaseButton);
-
-    quantity = screen.getByTestId('quantity-tid');
-    expect(quantity.textContent).toEqual('2');
-  });
-
-  it('should not decrease bellow zero when decrease button is repeatly clicked', () => {
-    setup();
+    const { product } = setup();
 
     const decreaseButton = screen.getByTestId('decrease-button-tid');
 
     fireEvent.click(decreaseButton);
-    fireEvent.click(decreaseButton);
 
-    const quantity = screen.getByTestId('quantity-tid');
+    expect(decrease).toHaveBeenCalledTimes(1);
+    expect(decrease).toHaveBeenCalledWith(product.id);
+  });
 
-    expect(quantity.textContent).toEqual('0');
-    expect(screen.getByTestId('decrease-button-tid')).toHaveProperty('disabled', true);
+  it('should call store.increase() when increase button gets clicked', () => {
+    const increase = jest.fn();
+    jest.mocked(useCartStore).mockImplementationOnce(() => ({ increase }));
+
+    const { product } = setup();
+
+    const increaseButton = screen.getByTestId('increase-button-tid');
+
+    fireEvent.click(increaseButton);
+
+    expect(increase).toHaveBeenCalledTimes(1);
+    expect(increase).toHaveBeenCalledWith(product.id);
   });
 
   it("should remove item when 'Remove item' button gets clicked", () => {

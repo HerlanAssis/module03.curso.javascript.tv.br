@@ -1,54 +1,88 @@
 import { ProductInterface } from '@/components/types';
 import { create } from 'zustand';
+import { produce, setAutoFreeze } from 'immer';
 import { CartStateInterface, CartStoreStateInterface, CartStoreType } from './types';
 
-const CartStore: CartStoreType = (set, get) => {
-  const filterProductListToRemoveItemsById = (
-    products: ProductInterface[],
-    productIds: string[],
-  ) => {
-    return products.filter((product) => !productIds.includes(product.id));
-  };
+const initialState: CartStoreStateInterface = {
+  open: false,
+  products: [],
+};
 
-  const mapProductListToUniqueItemsArray = (
+const CartStore: CartStoreType = (set) => {
+  const setState = (fn: (arg: CartStateInterface) => void) => set(produce(fn));
+
+  const mapProductHashTableToArray = (products: Map<string, ProductInterface>) =>
+    Array.from(products.values());
+
+  const mapProductListToHashTable = (
     products: ProductInterface[],
-    uniqueKey: keyof ProductInterface = 'id',
+    uniqueKey: keyof Omit<ProductInterface, 'quantity'> = 'id',
   ) => {
-    return Array.from(
-      new Map<string, ProductInterface>(
-        products.map((product) => [product[uniqueKey], product]),
-      ).values(),
+    return new Map<string, ProductInterface>(
+      products.map((product) => [product[uniqueKey], product]),
     );
-  };
-
-  const updateState = (
-    callback: (store: CartStateInterface) => Partial<CartStoreStateInterface>,
-  ) => {
-    set((store) => ({
-      state: { ...store.state, ...callback(store) },
-    }));
   };
 
   return {
     state: {
-      open: false,
-      products: [],
+      ...initialState,
     },
     actions: {
-      toggle: () =>
-        updateState((store) => ({
-          open: !store.state.open,
-        })),
-      add: (...product: ProductInterface[]) =>
-        updateState((store) => ({
-          open: true,
-          products: mapProductListToUniqueItemsArray([...store.state.products, ...product]),
-        })),
-      remove: (...productIds) =>
-        updateState((store) => ({
-          products: filterProductListToRemoveItemsById(store.state.products, productIds),
-        })),
-      clear: () => updateState(() => ({ products: [] })),
+      toggle: () => {
+        setState(({ state }) => {
+          state.open = !state.open;
+        });
+      },
+      add: (...products: ProductInterface[]) => {
+        setAutoFreeze(false);
+
+        setState(({ state }) => {
+          const productTable = mapProductListToHashTable(state.products);
+
+          products.forEach((newProduct) => {
+            newProduct.quantity = 0;
+            const product = productTable.get(newProduct.id) || newProduct;
+
+            product.quantity = (product?.quantity ?? 0) + 1;
+
+            productTable.set(product.id, product);
+          });
+
+          state.open = true;
+          state.products = mapProductHashTableToArray(productTable);
+        });
+      },
+      increase: (productId: string) => {
+        setState(({ state }) => {
+          const productIndex = state.products.findIndex(({ id }) => id === productId);
+
+          if (productIndex !== -1) {
+            state.products[productIndex].quantity =
+              (state.products[productIndex]?.quantity ?? 0) + 1;
+          }
+        });
+      },
+      decrease: (productId: string) => {
+        setState(({ state }) => {
+          const productIndex = state.products.findIndex(({ id }) => id === productId);
+
+          if (productIndex !== -1) {
+            if ((state.products[productIndex].quantity ?? 0) > 0) {
+              state.products[productIndex].quantity =
+                (state.products[productIndex]?.quantity ?? 0) - 1;
+            }
+          }
+        });
+      },
+      remove: (...productIds) => {
+        setState(({ state }) => {
+          state.products = state.products.filter((product) => !productIds.includes(product.id));
+        });
+      },
+      clear: () =>
+        setState((store) => {
+          store.state = { ...initialState };
+        }),
     },
   };
 };

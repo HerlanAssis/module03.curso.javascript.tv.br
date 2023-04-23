@@ -13,7 +13,6 @@ export default function Cart() {
   // TODO add correct implementation
   const handleCheckout = () => {
     clear();
-    toggleCart();
   };
 
   const hasProducts = !!products.length;

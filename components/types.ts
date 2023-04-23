@@ -13,9 +13,10 @@ export interface ProductCardInterface {
 }
 
 export interface CartItemInterface {
-  product: ProductType & { id: string };
+  product: ProductType & { id: string; quantity?: number };
 }
 
 export interface ProductInterface extends ProductType {
   id: string;
+  quantity?: number;
 }
