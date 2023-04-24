@@ -1,6 +1,6 @@
 import { ProductInterface } from '@/components/types';
 import { create } from 'zustand';
-import { produce, setAutoFreeze } from 'immer';
+import { produce } from 'immer';
 import { CartStateInterface, CartStoreStateInterface, CartStoreType } from './types';
 
 const initialState: CartStoreStateInterface = {
@@ -9,7 +9,7 @@ const initialState: CartStoreStateInterface = {
 };
 
 const CartStore: CartStoreType = (set) => {
-  const setState = (fn: (arg: CartStateInterface) => void) => set(produce(fn));
+  const setState = (fn: (draft: CartStateInterface) => void) => set((store) => produce(store, fn));
 
   const mapProductHashTableToArray = (products: Map<string, ProductInterface>) =>
     Array.from(products.values());
@@ -34,14 +34,15 @@ const CartStore: CartStoreType = (set) => {
         });
       },
       add: (...products: ProductInterface[]) => {
-        setAutoFreeze(false);
-
         setState(({ state }) => {
           const productTable = mapProductListToHashTable(state.products);
 
           products.forEach((newProduct) => {
-            newProduct.quantity = 0;
             const product = productTable.get(newProduct.id) || newProduct;
+
+            if (!productTable.get(product.id)) {
+              product.quantity = 0;
+            }
 
             product.quantity = (product?.quantity ?? 0) + 1;
 

@@ -68,7 +68,7 @@ describe('Cart store', () => {
     });
   });
 
-  fit('should be possible to add a product that has already been removed from the cart', () => {
+  it('should be possible to add a product that has already been removed from the cart', () => {
     const product = server.create('product') as unknown as ProductInterface;
 
     const { result } = setup();
